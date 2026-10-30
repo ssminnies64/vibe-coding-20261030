@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cute Cartoon Stopwatch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* Custom Styles for Bubbly Cartoon Aesthetics */
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .font-cartoon {
+            font-family: 'Fredoka One', cursive;
+        }
+
+        /* Top Left Title Container */
+        .title-container {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #5587b4;
+            text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.7);
+        }
+
+        /* Timer Circular Display */
+        .timer-circle {
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ffffff 0%, #f0fbff 100%);
+            box-shadow: 
+                0 20px 40px -10px rgba(0,0,0,0.15),
+                inset 0 -10px 20px rgba(0,0,0,0.05),
+                0 0 0 16px rgba(255, 255, 255, 0.4),
+                0 0 0 32px rgba(168, 237, 234, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .timer-circle:hover {
+            transform: scale(1.02);
+        }
+
+        /* Inner colorful spinning ring for that "timer running" feel */
+        .timer-ring {
+            position: absolute;
+            top: -16px;
+            left: -16px;
+            right: -16px;
+            bottom: -16px;
+            border-radius: 50%;
+            border: 8px dashed #ff9a9e;
+            animation: spin 15s linear infinite;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        
+        .timer-ring.active {
+            opacity: 1;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Time Text */
+        .time-display {
+            font-size: 3.5rem;
+            color: #4a6572;
+            letter-spacing: 2px;
+            text-shadow: 3px 3px 0px rgba(255,255,255,1);
+            position: relative;
+            z-index: 20;
+        }
+
+        /* Bubbly Buttons */
+        .bubbly-btn {
+            border: none;
+            border-radius: 50px;
+            padding: 1rem 2.5rem;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: white;
+            cursor: pointer;
+            outline: none;
+            box-shadow: 
+                0 10px 0 #00000020,
+                0 15px 20px rgba(0,0,0,0.2),
+                inset 0 -5px 0 rgba(0,0,0,0.1),
+                inset 0 5px 15px rgba(255,255,255,0.4);
+            transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bubbly-btn:active:not(:disabled) {
+            transform: translateY(10px);
+            box-shadow: 
+                0 0px 0 #00000020,
+                0 5px 10px rgba(0,0,0,0.2),
+                inset 0 -2px 0 rgba(0,0,0,0.1),
+                inset 0 2px 5px rgba(255,255,255,0.4);
+        }
+
+        .bubbly-btn:disabled {
+            background: #cbd5e1 !important;
+            color: #94a3b8;
+            cursor: not-allowed;
+            box-shadow: 
+                0 10px 0 #94a3b8,
+                0 15px 20px rgba(0,0,0,0.1);
+            transform: none;
+        }
+
+        .btn-main { background: linear-gradient(to bottom, #6ee7b7, #34d399); }
+        .btn-main.bg-pause { background: linear-gradient(to bottom, #fcd34d, #fbbf24); }
+        .btn-main.bg-continue { background: linear-gradient(to bottom, #93c5fd, #60a5fa); }
+        
+        .btn-reset { background: linear-gradient(to bottom, #fca5a5, #f87171); }
+
+        /* Floating background elements for extra cuteness */
+        .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(-20px) translateX(10px); }
+            100% { transform: translateY(0) translateX(0); }
+        }
+
+        @media (max-width: 640px) {
+            .timer-circle { width: 250px; height: 250px; }
+            .time-display { font-size: 2.75rem; }
+            .bubbly-btn { padding: 0.8rem 1.8rem; font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Bubbles -->
+    <div class="bubble w-16 h-16 top-20 right-20" style="animation-delay: 0s;"></div>
+    <div class="bubble w-10 h-10 bottom-32 left-20" style="animation-delay: 2s;"></div>
+    <div class="bubble w-24 h-24 top-40 left-10" style="animation-delay: 4s;"></div>
+    <div class="bubble w-12 h-12 bottom-20 right-32" style="animation-delay: 1s;"></div>
+
+    <!-- Title -->
+    <div class="title-container font-cartoon z-20">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+        </svg>
+        <span class="text-2xl tracking-wide">MY STOPWATCH</span>
+    </div>
+
+    <!-- Timer Display -->
+    <div class="mb-16 mt-8 relative z-20">
+        <div class="timer-circle">
+            <div id="timerRing" class="timer-ring"></div>
+            <div id="display" class="time-display font-cartoon">00:00:00</div>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="flex flex-row gap-6 z-20">
+        <button id="mainBtn" class="bubbly-btn btn-main font-cartoon w-40">Start</button>
+        <button id="resetBtn" class="bubbly-btn btn-reset font-cartoon w-40" disabled>Reset</button>
+    </div>
+
+    <script>
+        // DOM Elements
+        const display = document.getElementById('display');
+        const mainBtn = document.getElementById('mainBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const timerRing = document.getElementById('timerRing');
+
+        // State variables
+        let startTime = 0;
+        let elapsedTime = 0;
+        let timerInterval = null;
+        let isRunning = false;
+
+        // Formats time to MM:SS:ms (ms is actually centiseconds 00-99 for standard stopwatch display)
+        function formatTime(timeInMs) {
+            const date = new Date(timeInMs);
+            const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+            const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+            // Extract tens of milliseconds (00-99)
+            const centiseconds = String(Math.floor(date.getUTCMilliseconds() / 10)).padStart(2, '0');
+            return `${minutes}:${seconds}:${centiseconds}`;
+        }
+
+        // Timer animation loop using requestAnimationFrame for smooth UI
+        function updateTimer() {
+            elapsedTime = Date.now() - startTime;
+            display.textContent = formatTime(elapsedTime);
+            if (isRunning) {
+                timerInterval = requestAnimationFrame(updateTimer);
+            }
+        }
+
+        // Logic for Start / Pause / Continue
+        mainBtn.addEventListener('click', () => {
+            const currentState = mainBtn.textContent;
+
+            if (currentState === 'Start' || currentState === 'Continue') {
+                // State: Start/Resume
+                startTime = Date.now() - elapsedTime;
+                isRunning = true;
+                timerInterval = requestAnimationFrame(updateTimer);
+                
+                // UI Updates
+                mainBtn.textContent = 'Pause';
+                mainBtn.classList.remove('btn-main', 'bg-continue');
+                mainBtn.classList.add('bg-pause');
+                resetBtn.disabled = false;
+                timerRing.classList.add('active');
+
+            } else if (currentState === 'Pause') {
+                // State: Pause
+                isRunning = false;
+                cancelAnimationFrame(timerInterval);
+                
+                // UI Updates
+                mainBtn.textContent = 'Continue';
+                mainBtn.classList.remove('bg-pause');
+                mainBtn.classList.add('bg-continue');
+                timerRing.classList.remove('active');
+            }
+        });
+
+        // Logic for Reset
+        resetBtn.addEventListener('click', () => {
+            // Stop everything
+            isRunning = false;
+            cancelAnimationFrame(timerInterval);
+            elapsedTime = 0;
+            
+            // UI Updates
+            display.textContent = '00:00:00';
+            mainBtn.textContent = 'Start';
+            mainBtn.classList.remove('bg-pause', 'bg-continue');
+            mainBtn.classList.add('btn-main'); // Back to green
+            resetBtn.disabled = true;
+            timerRing.classList.remove('active');
+        });
+
+    </script>
+</body>
+</html>
